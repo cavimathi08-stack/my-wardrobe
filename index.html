@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Wardrobe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1d1d4f; --navy2:#2a2a6b; --lav:#c9c9f2; --pane:#dcdcee;
+  --blue:#5b5bff; --gray:#a9a9bb; --text:#1a1a40;
+  /* layout (landscape 4:3) */
+  --ratio:4/3; --tb:5.5cqw; --bb:4.6cqw; --cx:33cqw; --cw:34cqw;
+  --paneH:23.5cqw; --arrH:5cqw; --figH:56cqw;
+  --btnL:15cqw; --btnR:68cqw; --btnW:17cqw; --btnB:6cqw; --btnH:8.5cqw; --btnF:2.1cqw;
+  --tbF:1.6cqw; --bbF:2.3cqw; --zebraSize:42cqw;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:radial-gradient(ellipse at 50% 30%,#3a3a48 0%,#16161c 75%);
+  display:flex;align-items:center;justify-content:center;min-height:100vh;
+  font-family:'VT323',monospace;-webkit-tap-highlight-color:transparent;user-select:none;
+}
+.monitor{
+  width:min(96vw, calc((100vh - 32px) * 1.22), 1040px);
+  background:linear-gradient(#e6dfcb,#cfc7b1);
+  border-radius:3.2vmin;padding:2.6% 2.6% 4.2%;
+  box-shadow:0 2vmin 5vmin rgba(0,0,0,.6), inset 0 .4vmin 0 #f4efe2, inset 0 -.6vmin 0 #b2aa93;
+  position:relative;
+}
+.monitor::after{ /* little power light */
+  content:"";position:absolute;right:5%;bottom:1.5%;width:1.4%;aspect-ratio:1;border-radius:50%;
+  background:#7cff9a;box-shadow:0 0 8px #7cff9a;
+}
+.screen{
+  position:relative;width:100%;aspect-ratio:var(--ratio);overflow:hidden;
+  container-type:inline-size;background:#000;border-radius:1.6% / 2.1%;
+  box-shadow:0 0 0 .5vmin #8e877a, inset 0 0 3vmin rgba(0,0,0,.8);
+}
+/* CRT glass */
+.screen::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:50;
+  background:
+    repeating-linear-gradient(0deg,rgba(0,0,0,.09) 0 1px,transparent 1px 3px),
+    radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.35) 100%);
+}
+.zebra{background-image:var(--zebra);background-size:var(--zebraSize);background-color:#fff}
+
+/* ---------- views ---------- */
+.view{position:absolute;inset:0;display:none}
+.view.on{display:block}
+
+/* ---------- welcome ---------- */
+#welcome{display:none;align-items:center;justify-content:center}
+#welcome.on{display:flex}
+.card{
+  width:62cqw;background:var(--navy);border:.5cqw solid;border-color:#6a6ad8 #0b0b2a #0b0b2a #6a6ad8;
+  padding:3cqw 3cqw 3.2cqw;text-align:center;box-shadow:1.2cqw 1.2cqw 0 rgba(0,0,0,.35);
+}
+.logo{font-family:'Press Start 2P',monospace;color:var(--lav);font-size:3.6cqw;line-height:1.35;
+  text-shadow:.35cqw .35cqw 0 #000, -.15cqw -.15cqw 0 #6a6ad8;letter-spacing:.2cqw;margin:0 0 2cqw;word-break:break-word}
+.season{display:inline-block;font-family:'Press Start 2P',monospace;color:#fff;font-size:1.5cqw;
+  border:.3cqw solid var(--lav);padding:.8cqw 1.4cqw;margin-bottom:3cqw}
+.namerow{display:flex;align-items:center;justify-content:center;gap:1.5cqw;margin-bottom:3cqw}
+.namerow label{font-size:3.2cqw;color:var(--lav)}
+.namerow input{
+  font-family:'VT323',monospace;font-size:3.4cqw;width:26cqw;padding:.3cqw 1cqw;text-transform:uppercase;
+  background:var(--pane);color:var(--text);border:.4cqw solid;border-color:#555 #fff #fff #555;outline:none;
+}
+.welcome-btns{display:flex;justify-content:center;align-items:center;gap:3cqw}
+.facechip{width:7cqw;height:7cqw;border-radius:50%;background:var(--pane) center/cover;border:.4cqw solid var(--lav);display:none}
+.facechip.has{display:block}
+
+/* ---------- retro buttons ---------- */
+.btn{
+  font-family:'Press Start 2P',monospace;cursor:pointer;color:var(--text);
+  border:.45cqw solid;border-color:#ffffff #3c3c55 #3c3c55 #ffffff;
+  background:var(--gray);padding:0;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.25;
+}
+.btn:active,.btn.pressed{border-color:#3c3c55 #ffffff #ffffff #3c3c55;transform:translate(.15cqw,.15cqw)}
+.btn.blue{background:var(--blue);color:#0c0c35;border-color:#b9b9ff #1a1a7a #1a1a7a #b9b9ff}
+.btn.blue:active,.btn.blue.pressed{border-color:#1a1a7a #b9b9ff #b9b9ff #1a1a7a}
+.start{font-size:2.6cqw;padding:1.6cqw 4cqw;animation:pulse 1.1s steps(2) infinite}
+.small{font-size:1.4cqw;padding:1.3cqw 1.8cqw}
+@keyframes pulse{50%{background:#8a8aff}}
+
+/* ---------- wardrobe frame ---------- */
+.titlebar{position:absolute;left:0;right:0;top:0;height:var(--tb);background:var(--navy);
+  display:flex;align-items:center;border-bottom:.35cqw solid #0b0b2a;z-index:5}
+.titlebar .who{font-family:'Press Start 2P',monospace;font-size:var(--tbF);color:var(--lav);padding-left:1.4cqw;
+  text-shadow:.2cqw .2cqw 0 #000;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:32%}
+.titlebar .season{position:absolute;left:50%;transform:translateX(-50%);margin:0;font-size:var(--tbF);
+  padding:.5cqw 1cqw;border-width:.25cqw;white-space:nowrap}
+.side{position:absolute;top:var(--tb);bottom:var(--bb)}
+.side.l{left:0;width:var(--cx);border-right:.5cqw solid var(--navy)}
+.side.r{left:calc(var(--cx) + var(--cw));right:0;border-left:.5cqw solid var(--navy)}
+.center{position:absolute;top:var(--tb);bottom:var(--bb);left:var(--cx);width:var(--cw);background:var(--navy2);
+  padding:1.2cqw 1.1cqw;display:flex;flex-direction:column;gap:.8cqw}
+.pane{position:relative;height:var(--paneH);background:var(--pane);flex:none;
+  border:.45cqw solid;border-color:#55557a #ffffff #ffffff #55557a;overflow:hidden}
+.pane svg.thumb{position:absolute;inset:6% 6% 14%;width:88%;height:80%;
+  filter:drop-shadow(0 0 .25cqw #fff) drop-shadow(.4cqw .5cqw 0 rgba(0,0,0,.28))}
+.pane .tag{position:absolute;left:.8cqw;bottom:.2cqw;font-size:var(--bbF);color:var(--text);line-height:1}
+.pane .count{position:absolute;right:.8cqw;top:.3cqw;font-size:var(--bbF);color:#55557a;line-height:1}
+.arrows{display:flex;gap:.8cqw;height:var(--arrH);flex:none;margin-bottom:.8cqw}
+.arrows .btn{flex:1;background:#b7b7c9}
+.arrows svg{height:52%;width:auto}
+.fig{position:relative;height:var(--figH);flex:none}
+.fig svg{position:absolute;inset:3% 0 2%;width:100%;height:95%}
+.status{flex:1;display:flex;align-items:center;justify-content:center;font-family:'Press Start 2P',monospace;
+  font-size:var(--tbF);color:#9cff9c;text-shadow:.2cqw .2cqw 0 #000;text-align:center;min-height:0}
+.status.bad{color:#ff4d6d;animation:blink .45s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.mainbtn{position:absolute;bottom:var(--btnB);height:var(--btnH);width:var(--btnW);font-size:var(--btnF);z-index:6}
+#leftBtn{left:var(--btnL)}
+#rightBtn{left:var(--btnR)}
+.bottombar{position:absolute;left:0;right:0;bottom:0;height:var(--bb);background:var(--navy);border-top:.35cqw solid #0b0b2a;
+  display:flex;align-items:center;justify-content:space-around;flex-wrap:wrap;padding:0 1cqw;z-index:5}
+.bottombar span{font-size:var(--bbF);color:var(--lav);letter-spacing:.15cqw;cursor:pointer;line-height:1;padding:.3cqw .4cqw}
+.bottombar span:hover{color:#fff;background:#3a3a8a}
+.mode-dress .browse-only{display:none!important}
+.mode-browse .dress-only{display:none!important}
+.toast{position:absolute;left:50%;top:calc(var(--tb) + 2cqw);transform:translateX(-50%);z-index:40;
+  background:var(--navy);color:#fff;font-family:'Press Start 2P',monospace;font-size:var(--tbF);
+  padding:1.2cqw 1.8cqw;border:.35cqw solid var(--lav);box-shadow:.8cqw .8cqw 0 rgba(0,0,0,.4);
+  white-space:nowrap;display:none}
+.toast.on{display:block}
+input[type=file]{display:none}
+
+/* ---------- portrait / phones ---------- */
+@media (max-aspect-ratio: 4/5){
+  :root{
+    --ratio:9/16; --tb:10cqw; --bb:12cqw; --cx:9cqw; --cw:82cqw;
+    --paneH:47cqw; --arrH:10cqw; --figH:112cqw;
+    --btnL:9cqw; --btnR:51cqw; --btnW:40cqw; --btnB:14cqw; --btnH:13cqw; --btnF:3.6cqw;
+    --tbF:2.9cqw; --bbF:4.4cqw; --zebraSize:70cqw;
+  }
+  .monitor{width:min(96vw, calc((100vh - 24px) * .53));padding:3.5% 3.5% 7%;border-radius:4vmin}
+  .card{width:84cqw;padding:6cqw 4cqw}
+  .logo{font-size:6cqw}
+  .titlebar + .season, .card .season{font-size:3cqw;padding:1.4cqw 2cqw}
+  .namerow{flex-direction:column;gap:2cqw}
+  .namerow label{font-size:5.5cqw}
+  .namerow input{font-size:6cqw;width:60cqw}
+  .welcome-btns{flex-direction:column;gap:4cqw}
+  .start{font-size:4.6cqw;padding:3cqw 7cqw}
+  .small{font-size:2.8cqw;padding:2.4cqw 3cqw}
+  .facechip{width:14cqw;height:14cqw}
+  .titlebar .who{max-width:40%}
+  .titlebar .season{left:auto;right:1.4cqw;transform:none}
+  .center{padding:2.4cqw 2.2cqw;gap:1.6cqw}
+  .arrows{gap:1.6cqw;margin-bottom:1.6cqw}
+  .status{flex:none;height:10cqw}
+}
+</style>
+</head>
+<body>
+
+<!-- shared SVG patterns -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="plaidY" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect width="20" height="20" fill="#f3d11c"/>
+      <rect y="6" width="20" height="5" fill="#2a2a2a" opacity=".3"/>
+      <rect x="6" width="5" height="20" fill="#2a2a2a" opacity=".3"/>
+      <rect y="15.5" width="20" height="1.2" fill="#c7342a" opacity=".85"/>
+      <rect x="15.5" width="1.2" height="20" fill="#c7342a" opacity=".85"/>
+      <rect y="2" width="20" height=".7" fill="#fff" opacity=".8"/>
+      <rect x="2" width=".7" height="20" fill="#fff" opacity=".8"/>
+    </pattern>
+    <pattern id="plaidP" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect width="20" height="20" fill="#f7a8c6"/>
+      <rect y="6" width="20" height="5" fill="#fff" opacity=".45"/>
+      <rect x="6" width="5" height="20" fill="#fff" opacity=".45"/>
+      <rect y="15.5" width="20" height="1.2" fill="#8a1f55" opacity=".8"/>
+      <rect x="15.5" width="1.2" height="20" fill="#8a1f55" opacity=".8"/>
+      <rect y="2" width="20" height=".7" fill="#d94a8c" opacity=".8"/>
+      <rect x="2" width=".7" height="20" fill="#d94a8c" opacity=".8"/>
+    </pattern>
+    <pattern id="plaidR" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect width="20" height="20" fill="#c41a2e"/>
+      <rect y="6" width="20" height="5" fill="#111" opacity=".4"/>
+      <rect x="6" width="5" height="20" fill="#111" opacity=".4"/>
+      <rect y="15.5" width="20" height="1.2" fill="#f2c94c" opacity=".9"/>
+      <rect x="15.5" width="1.2" height="20" fill="#f2c94c" opacity=".9"/>
+      <rect y="2" width="20" height=".7" fill="#fff" opacity=".6"/>
+      <rect x="2" width=".7" height="20" fill="#fff" opacity=".6"/>
+    </pattern>
+    <pattern id="fuzz" width="6" height="6" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#c7a6ec"/>
+      <circle cx="1.5" cy="1.5" r=".9" fill="#e3d0ff"/>
+      <circle cx="4.5" cy="4.2" r=".8" fill="#a985d6"/>
+    </pattern>
+    <pattern id="denim" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="4" fill="#3d5f96"/>
+      <path d="M0,4 L4,0" stroke="#5c7fb8" stroke-width=".8"/>
+    </pattern>
+    <clipPath id="faceClip"><circle cx="100" cy="42" r="25"/></clipPath>
+  </defs>
+</svg>
+
+<div class="monitor">
+  <div class="screen zebra" id="screen">
+
+    <!-- WELCOME -->
+    <section class="view on zebra" id="welcome">
+      <div class="card">
+        <h1 class="logo" id="logo">MY<br>WARDROBE</h1>
+        <div class="season">FALL FASHIONS</div>
+        <div class="namerow">
+          <label for="nameIn">YOUR NAME:</label>
+          <input id="nameIn" maxlength="12" autocomplete="off" spellcheck="false" placeholder="________">
+        </div>
+        <div class="welcome-btns">
+          <button class="btn blue start" id="startBtn">START</button>
+          <button class="btn small" id="photoBtn1">+ ADD MY PHOTO</button>
+          <div class="facechip" id="faceChip"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WARDROBE (browse + dress me) -->
+    <section class="view mode-browse" id="wardrobe">
+      <div class="titlebar">
+        <div class="who" id="who" title="Back to start">MY WARDROBE</div>
+        <div class="season">FALL FASHIONS</div>
+      </div>
+
+      <div class="side l zebra"></div>
+      <div class="side r zebra" style="background-position:50% 30%"></div>
+
+      <div class="center">
+        <!-- browse -->
+        <div class="pane browse-only" id="paneTop"></div>
+        <div class="arrows browse-only" data-slot="top">
+          <button class="btn" data-dir="-1" title="Previous"><svg viewBox="0 0 26 12"><rect x="0" y="0" width="3" height="12" fill="#1d1d4f"/><polygon points="14,0 4,6 14,12" fill="#1d1d4f"/><polygon points="25,0 15,6 25,12" fill="#1d1d4f"/></svg></button>
+          <button class="btn" data-dir="1" title="Next"><svg viewBox="0 0 12 12"><polygon points="1,0 11,6 1,12" fill="#1d1d4f"/></svg></button>
+          <button class="btn" data-dir="r" title="Surprise me"><svg viewBox="0 0 26 12"><polygon points="1,0 11,6 1,12" fill="#1d1d4f"/><polygon points="12,0 22,6 12,12" fill="#1d1d4f"/><rect x="23" y="0" width="3" height="12" fill="#1d1d4f"/></svg></button>
+        </div>
+        <div class="pane browse-only" id="paneBot"></div>
+        <div class="arrows browse-only" data-slot="bottom">
+          <button class="btn" data-dir="-1" title="Previous"><svg viewBox="0 0 26 12"><rect x="0" y="0" width="3" height="12" fill="#1d1d4f"/><polygon points="14,0 4,6 14,12" fill="#1d1d4f"/><polygon points="25,0 15,6 25,12" fill="#1d1d4f"/></svg></button>
+          <button class="btn" data-dir="1" title="Next"><svg viewBox="0 0 12 12"><polygon points="1,0 11,6 1,12" fill="#1d1d4f"/></svg></button>
+          <button class="btn" data-dir="r" title="Surprise me"><svg viewBox="0 0 26 12"><polygon points="1,0 11,6 1,12" fill="#1d1d4f"/><polygon points="12,0 22,6 12,12" fill="#1d1d4f"/><rect x="23" y="0" width="3" height="12" fill="#1d1d4f"/></svg></button>
+        </div>
+        <!-- dress me -->
+        <div class="pane fig dress-only" id="figPane"></div>
+        <div class="status dress-only" id="status"></div>
+      </div>
+
+      <button class="btn blue mainbtn" id="leftBtn">BROWSE</button>
+      <button class="btn mainbtn" id="rightBtn">DRESS<br>ME</button>
+
+      <div class="bottombar">
+        <span data-act="shoes">SHOES</span>
+        <span data-act="bottoms">BOTTOMS</span>
+        <span data-act="shirts">SHIRTS</span>
+        <span data-act="sweaters">SWEATERS</span>
+        <span data-act="skin">SKIN TONE</span>
+        <span data-act="hair">HAIR COLOUR</span>
+      </div>
+
+      <div class="toast" id="toast"></div>
+    </section>
+
+  </div>
+</div>
+<input type="file" id="fileIn" accept="image/*">
+
+<script>
+/* ================= blue zebra background (drawn, seamless tile) ================= */
+(function makeZebra(){
+  const T = 512, c = document.createElement('canvas'); c.width = c.height = T;
+  const g = c.getContext('2d'), im = g.createImageData(T, T), d = im.data;
+  const hash = (x, y, s) => { let h = Math.imul(x, 374761393) + Math.imul(y, 668265263) + Math.imul(s, 982451653);
+    h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16; return (h >>> 0) / 4294967295; };
+  const noise = (x, y, p, s) => {
+    const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+    const u = xf*xf*(3-2*xf), v = yf*yf*(3-2*yf), m = a => ((a % p) + p) % p;
+    const a = hash(m(xi), m(yi), s), b = hash(m(xi+1), m(yi), s), c2 = hash(m(xi), m(yi+1), s), e = hash(m(xi+1), m(yi+1), s);
+    return a + (b-a)*u + (c2-a)*v + (a-b-c2+e)*u*v;
+  };
+  for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) {
+    const n = noise(x/128, y/128, 4, 1)*.6 + noise(x/64, y/64, 8, 2)*.3 + noise(x/32, y/32, 16, 3)*.1;
+    const fur = (noise(x/3, y/3, 171, 4) - .5) + (noise(x/2, y/7, 256, 5) - .5)*.5;
+    const ph = 2*Math.PI*(7*x/T + 3*y/T) + n*13;
+    const on = Math.sin(ph) + fur*.5 > .22;
+    const i = (y*T + x)*4;
+    if (on) { d[i]=166; d[i+1]=228; d[i+2]=246; } else { d[i]=255; d[i+1]=255; d[i+2]=255; }
+    d[i+3] = 255;
+  }
+  g.putImageData(im, 0, 0);
+  document.documentElement.style.setProperty('--zebra', `url(${c.toDataURL('image/png')})`);
+})();
+
+/* ================= wardrobe data ================= */
+// Figure space: viewBox 0 0 200 448. Left-side pieces are mirrored for the right side.
+const mirror = s => s + `<g transform="translate(200 0) scale(-1 1)">${s}</g>`;
+const LINE = '#2a2433';
+
+function blazer(f, inner, tee = true){
+  const sleeve = `<path d="M74,92 L52,198" stroke="${LINE}" stroke-width="19" stroke-linecap="round" fill="none"/>
+                  <path d="M74,92 L52,198" stroke="${f}" stroke-width="17" stroke-linecap="round" fill="none"/>
+                  <path d="M47,192 L58,195" stroke="${LINE}" stroke-width=".8"/>`;
+  return mirror(sleeve) + `
+    <path d="M71,86 Q100,79 129,86 L133,122 L126,168 L131,214 L69,214 L74,168 L67,122 Z" fill="${f}" stroke="${LINE}" stroke-width="1.2"/>
+    <path d="M88,85 L112,85 L100,142 Z" fill="${inner}"/>
+    ${tee ? `<path d="M91,85 Q100,96 109,85 Z" fill="#fff"/>` : ''}
+    <path d="M88,85 L80,112 L95,128 L100,142 M112,85 L120,112 L105,128 L100,142" fill="none" stroke="${LINE}" stroke-width="1.1"/>
+    <path d="M100,142 L100,214" stroke="${LINE}" stroke-width=".9"/>
+    <circle cx="94" cy="156" r="2" fill="${LINE}"/><circle cx="106" cy="156" r="2" fill="${LINE}"/>
+    <circle cx="94" cy="174" r="2" fill="${LINE}"/><circle cx="106" cy="174" r="2" fill="${LINE}"/>
+    <path d="M76,186 L90,186 M110,186 L124,186" stroke="${LINE}" stroke-width="1.1"/>`;
+}
+function tee(f){
+  const sleeve = `<path d="M74,92 L66,128" stroke="${LINE}" stroke-width="22" fill="none"/>
+                  <path d="M74,92 L66,128" stroke="${f}" stroke-width="20" fill="none"/>`;
+  return mirror(sleeve) + `
+    <path d="M73,87 Q100,81 127,87 L126,130 L123,170 L77,170 L74,130 Z" fill="${f}" stroke="${LINE}" stroke-width="1.2"/>
+    <path d="M90,86 Q100,98 110,86" fill="none" stroke="${LINE}" stroke-width="1.2"/>`;
+}
+function sweater(f, turtle = false){
+  const sleeve = `<path d="M74,92 L52,200" stroke="${LINE}" stroke-width="20" stroke-linecap="round" fill="none"/>
+                  <path d="M74,92 L52,200" stroke="${f}" stroke-width="18" stroke-linecap="round" fill="none"/>
+                  <path d="M46,193 L59,196 M46,197 L58,200" stroke="${LINE}" stroke-width=".6" opacity=".6"/>`;
+  return mirror(sleeve) + `
+    <path d="M72,87 Q100,80 128,87 L131,124 L126,170 L128,204 L72,204 L74,170 L69,124 Z" fill="${f}" stroke="${LINE}" stroke-width="1.2"/>
+    <path d="M73,196 L127,196" stroke="${LINE}" stroke-width=".7" opacity=".6"/>
+    ${turtle ? `<rect x="91" y="60" width="18" height="30" rx="4" fill="${f}" stroke="${LINE}" stroke-width="1.1"/>
+                <path d="M92,66 L108,66 M92,72 L108,72" stroke="#444" stroke-width=".6"/>`
+             : `<path d="M90,86 Q100,97 110,86" fill="none" stroke="${LINE}" stroke-width="2.2"/>`}`;
+}
+function skirt(f){
+  return `<path d="M80,164 L120,164 L134,250 L66,250 Z" fill="${f}" stroke="${LINE}" stroke-width="1.2"/>
+    <rect x="80" y="164" width="40" height="7" fill="${f}" stroke="${LINE}" stroke-width="1"/>
+    <path d="M88,171 L82,250 M96,171 L94,250 M104,171 L106,250 M112,171 L118,250" stroke="${LINE}" stroke-width=".8" opacity=".7"/>`;
+}
+function pants(f, stitch = false){
+  return `<path d="M79,164 L121,164 L125,214 L121,420 L102,420 L100,234 L98,420 L79,420 L75,214 Z" fill="${f}" stroke="${LINE}" stroke-width="1.2"/>
+    <rect x="79" y="164" width="42" height="7" fill="${f}" stroke="${LINE}" stroke-width="1"/>
+    ${stitch ? `<path d="M83,176 Q88,190 96,178 M117,176 Q112,190 104,178" fill="none" stroke="#e8b04a" stroke-width=".8"/>` : ''}
+    <path d="M100,171 L100,206" stroke="${LINE}" stroke-width=".8"/>`;
+}
+
+const VB_TOP = '34 58 132 162', VB_SKIRT = '56 158 88 98', VB_PANTS = '40 158 120 268';
+const TOPS = [
+  { name:'YELLOW PLAID BLAZER', fam:'yellow', vb:VB_TOP, draw:() => blazer('url(#plaidY)', '#f5d53a') },
+  { name:'PINK PLAID BLAZER',   fam:'pink',   vb:VB_TOP, draw:() => blazer('url(#plaidP)', '#ffffff') },
+  { name:'RED PLAID BLAZER',    fam:'red',    vb:VB_TOP, draw:() => blazer('url(#plaidR)', '#111111') },
+  { name:'WHITE BABY TEE',      fam:'neutral',vb:VB_TOP, draw:() => tee('#fbfbfb') },
+  { name:'LILAC FUZZY SWEATER', fam:'lilac',  vb:VB_TOP, draw:() => sweater('url(#fuzz)') },
+  { name:'BLACK TURTLENECK',    fam:'neutral',vb:VB_TOP, draw:() => sweater('#1c1c22', true) },
+];
+const BOTTOMS = [
+  { name:'YELLOW PLAID SKIRT', fam:'yellow', vb:VB_SKIRT, draw:() => skirt('url(#plaidY)') },
+  { name:'PINK PLAID SKIRT',   fam:'pink',   vb:VB_SKIRT, draw:() => skirt('url(#plaidP)') },
+  { name:'RED PLAID SKIRT',    fam:'red',    vb:VB_SKIRT, draw:() => skirt('url(#plaidR)') },
+  { name:'BLACK MINI SKIRT',   fam:'neutral',vb:VB_SKIRT, draw:() => skirt('#1c1c22') },
+  { name:'WHITE TENNIS SKIRT', fam:'neutral',vb:VB_SKIRT, draw:() => skirt('#fbfbfb') },
+  { name:'BLACK TROUSERS',     fam:'neutral',vb:VB_PANTS, draw:() => pants('#1c1c22'), pants:true },
+  { name:'DENIM JEANS',        fam:'neutral',vb:VB_PANTS, draw:() => pants('url(#denim)', true), pants:true },
+];
+const SHOES = [
+  { name:'WHITE KNEE BOOTS', draw:() => mirror(`<path d="M82,300 L99.2,300 L98.6,412 L100.5,432 L79,433 Q76,425 84,417 Z" fill="#fafafa" stroke="#8a8a99" stroke-width="1"/><path d="M80,432 L100.5,432" stroke="#8a8a99" stroke-width="2"/>`) },
+  { name:'BLACK MARY JANES', draw:() => mirror(`<path d="M85,410 L98.4,410 L100.5,431 L79,432 Q76,424 85,418 Z" fill="#111"/><path d="M85,416 L98.6,414" stroke="#111" stroke-width="2.5"/><rect x="79" y="431" width="22" height="2.5" fill="#333"/>`) },
+  { name:'PINK HEELS', draw:() => mirror(`<path d="M86,412 L98.4,411 L100,428 L80,431 Q77,424 86,418 Z" fill="#ff8fbf" stroke="#b8336f" stroke-width=".8"/><rect x="96" y="428" width="3" height="8" fill="#b8336f"/>`) },
+  { name:'CHUNKY LOAFERS', draw:() => mirror(`<path d="M84,410 L98.6,410 L100.5,428 L78,429 Q75,421 84,416 Z" fill="#5a3a22"/><rect x="77" y="428" width="24" height="6" rx="1" fill="#222"/><path d="M84,416 L98,415" stroke="#c9a36a" stroke-width="1.5"/>`) },
+];
+const SKINS = ['#f3cfb3','#e2b48e','#c68a5e','#9a6440','#6b4329'];
+const HAIRS = [
+  { name:'BROWN', c:'#7a4b2a' }, { name:'BLONDE', c:'#e8c56a' }, { name:'BLACK', c:'#1e1a1a' },
+  { name:'RED', c:'#b2462a' }, { name:'PLATINUM', c:'#f1ead2' }, { name:'PINK', c:'#ff8fc4' }, { name:'BLUE', c:'#6fc8ec' },
+];
+
+/* ================= state ================= */
+let S = { name:'', face:'', top:0, bottom:0, shoe:0, skin:0, hair:0 };
+try { Object.assign(S, JSON.parse(localStorage.getItem('my-wardrobe') || '{}')); } catch(e) {}
+const save = () => { try { localStorage.setItem('my-wardrobe', JSON.stringify(S)); } catch(e) {} };
+
+const $ = s => document.querySelector(s);
+const wardrobe = $('#wardrobe');
+
+/* ================= sound ================= */
+let AC;
+function beep(f = 660, ms = 55){
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = 'square'; o.frequency.value = f; g.gain.value = .04;
+    o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime + ms/1000);
+  } catch(e) {}
+}
+
+/* ================= rendering ================= */
+function thumb(item, i, n){
+  return `<svg class="thumb" viewBox="${item.vb}" preserveAspectRatio="xMidYMid meet">${item.draw()}</svg>
+          <div class="tag">${item.name}</div><div class="count">${i+1}/${n}</div>`;
+}
+function renderPanes(){
+  $('#paneTop').innerHTML = thumb(TOPS[S.top], S.top, TOPS.length);
+  $('#paneBot').innerHTML = thumb(BOTTOMS[S.bottom], S.bottom, BOTTOMS.length);
+}
+function head(skin){
+  const hc = HAIRS[S.hair % HAIRS.length].c;
+  const back = `<path d="M74,44 Q72,13 100,13 Q128,13 126,44 L124,76 Q100,82 76,76 Z" fill="${hc}"/>`;
+  if (S.face) return `
+    <path d="M70,44 Q68,8 100,8 Q132,8 130,44 L128,80 Q100,88 72,80 Z" fill="${hc}"/>
+    <circle cx="100" cy="42" r="26.5" fill="#1d1d4f"/>
+    <image href="${S.face}" x="75" y="17" width="50" height="50" preserveAspectRatio="xMidYMid slice" clip-path="url(#faceClip)"/>`;
+  return `${back}
+    <ellipse cx="100" cy="44" rx="21" ry="24" fill="${skin}"/>
+    <path d="M79,36 Q86,18 100,19 Q116,18 122,36 Q108,27 96,31 Q86,33 79,36 Z" fill="${hc}"/>
+    <circle cx="92" cy="45" r="1.8" fill="#2a2433"/><circle cx="108" cy="45" r="1.8" fill="#2a2433"/>
+    <path d="M94,56 Q100,60 106,56" fill="none" stroke="#b5475f" stroke-width="1.6" stroke-linecap="round"/>
+    <circle cx="88" cy="52" r="3" fill="#ff9aa8" opacity=".4"/><circle cx="112" cy="52" r="3" fill="#ff9aa8" opacity=".4"/>`;
+}
+function figureSVG(){
+  const skin = SKINS[S.skin % SKINS.length], top = TOPS[S.top], bot = BOTTOMS[S.bottom];
+  const body = mirror(`
+      <path d="M74,92 L50,210" stroke="${skin}" stroke-width="12" stroke-linecap="round"/>
+      <circle cx="50" cy="212" r="7" fill="${skin}"/>
+      <path d="M78,200 L100,200 L98,416 L86,416 Z" fill="${skin}"/>`) + `
+      <rect x="93" y="58" width="14" height="34" fill="${skin}"/>
+      <path d="M74,86 Q100,80 126,86 L124,130 L118,168 L123,210 L77,210 L82,168 L76,130 Z" fill="${skin}"/>`;
+  // draw order: body, shoes, bottom, top, head
+  return `<svg viewBox="20 6 160 436" preserveAspectRatio="xMidYMid meet">
+      <ellipse cx="100" cy="436" rx="44" ry="5" fill="#000" opacity=".12"/>
+      ${body}${SHOES[S.shoe].draw()}${bot.draw()}${top.draw()}${head(skin)}
+    </svg>`;
+}
+function renderFigure(){
+  $('#figPane').innerHTML = figureSVG();
+  const a = TOPS[S.top].fam, b = BOTTOMS[S.bottom].fam;
+  const clash = a !== 'neutral' && b !== 'neutral' && a !== b;
+  const st = $('#status');
+  st.className = 'status dress-only' + (clash ? ' bad' : '');
+  st.textContent = clash ? 'MISMATCH!' : "LOOKIN' GOOD!";
+  if (clash) { beep(220, 160); setTimeout(() => beep(180, 200), 180); }
+}
+function renderName(){
+  const n = (S.name || '').trim().toUpperCase();
+  const label = n ? `${n}'S WARDROBE` : 'MY WARDROBE';
+  $('#who').textContent = label;
+  $('#logo').innerHTML = n ? `${n}'S<br>WARDROBE` : 'MY<br>WARDROBE';
+  document.title = n ? `${n}'s Wardrobe` : 'My Wardrobe';
+  const chip = $('#faceChip');
+  chip.classList.toggle('has', !!S.face);
+  chip.style.backgroundImage = S.face ? `url(${S.face})` : '';
+}
+
+/* ================= navigation ================= */
+function show(id){
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === id));
+}
+function setMode(mode){
+  wardrobe.classList.toggle('mode-browse', mode === 'browse');
+  wardrobe.classList.toggle('mode-dress', mode === 'dress');
+  const L = $('#leftBtn'), R = $('#rightBtn');
+  if (mode === 'browse') { L.textContent = 'BROWSE'; R.innerHTML = 'DRESS<br>ME'; renderPanes(); }
+  else { L.textContent = 'BROWSE'; R.innerHTML = 'MY<br>PHOTO'; renderFigure(); }
+}
+const mode = () => wardrobe.classList.contains('mode-dress') ? 'dress' : 'browse';
+
+let toastT;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 1600);
+}
+const refresh = () => { save(); mode() === 'dress' ? renderFigure() : renderPanes(); };
+
+/* ================= events ================= */
+$('#nameIn').value = S.name || '';
+$('#nameIn').addEventListener('input', e => { S.name = e.target.value; save(); renderName(); });
+$('#nameIn').addEventListener('keydown', e => { if (e.key === 'Enter') $('#startBtn').click(); });
+
+$('#startBtn').addEventListener('click', () => {
+  beep(523); setTimeout(() => beep(784, 90), 70);
+  show('wardrobe'); setMode('browse');
+});
+$('#who').addEventListener('click', () => { beep(440); show('welcome'); });
+
+document.querySelectorAll('.arrows').forEach(row => {
+  row.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const slot = row.dataset.slot, list = slot === 'top' ? TOPS : BOTTOMS, key = slot === 'top' ? 'top' : 'bottom';
+    const dir = b.dataset.dir;
+    if (dir === 'r') { let n; do { n = Math.floor(Math.random()*list.length); } while (n === S[key] && list.length > 1); S[key] = n; }
+    else S[key] = (S[key] + Number(dir) + list.length) % list.length;
+    beep(dir === 'r' ? 880 : 660); save(); renderPanes();
+  });
+});
+
+let shuffling = false;
+$('#leftBtn').addEventListener('click', () => {
+  if (mode() === 'dress') { beep(520); setMode('browse'); return; }
+  if (shuffling) return; shuffling = true;
+  let k = 0;
+  const tick = () => {
+    S.top = Math.floor(Math.random()*TOPS.length);
+    S.bottom = Math.floor(Math.random()*BOTTOMS.length);
+    renderPanes(); beep(500 + k*40, 30);
+    if (++k < 12) setTimeout(tick, 70 + k*8); else { shuffling = false; save(); beep(988, 120); }
+  };
+  tick();
+});
+$('#rightBtn').addEventListener('click', () => {
+  if (mode() === 'browse') { beep(659); setTimeout(() => beep(880, 90), 80); setMode('dress'); }
+  else $('#fileIn').click();
+});
+$('#photoBtn1').addEventListener('click', () => $('#fileIn').click());
+
+$('#fileIn').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  const url = URL.createObjectURL(f), img = new Image();
+  img.onload = () => {
+    const s = Math.min(img.width, img.height), sx = (img.width - s)/2, sy = Math.max(0, (img.height - s)*0.2);
+    const c = document.createElement('canvas'); c.width = c.height = 260;
+    c.getContext('2d').drawImage(img, sx, sy, s, s, 0, 0, 260, 260);
+    S.face = c.toDataURL('image/jpeg', .85); URL.revokeObjectURL(url);
+    save(); renderName(); if (mode() === 'dress') renderFigure();
+    toast('PHOTO SAVED!'); beep(880);
+  };
+  img.src = url; e.target.value = '';
+});
+
+$('.bottombar').addEventListener('click', e => {
+  const sp = e.target.closest('span'); if (!sp) return; beep(740, 40);
+  const isSweater = t => /SWEATER|TURTLE/.test(t.name);
+  const nextOf = (list, cur, ok) => { for (let k = 1; k <= list.length; k++) { const i = (cur + k) % list.length; if (ok(list[i])) return i; } return cur; };
+  switch (sp.dataset.act) {
+    case 'shoes':    S.shoe = (S.shoe + 1) % SHOES.length; toast(SHOES[S.shoe].name); break;
+    case 'bottoms':  S.bottom = (S.bottom + 1) % BOTTOMS.length; toast(BOTTOMS[S.bottom].name); break;
+    case 'shirts':   S.top = nextOf(TOPS, S.top, t => !isSweater(t)); toast(TOPS[S.top].name); break;
+    case 'sweaters': S.top = nextOf(TOPS, S.top, isSweater); toast(TOPS[S.top].name); break;
+    case 'skin':     S.skin = (S.skin + 1) % SKINS.length; toast('SKIN TONE ' + (S.skin + 1) + '/' + SKINS.length); break;
+    case 'hair':     S.hair = (S.hair + 1) % HAIRS.length; toast('HAIR: ' + HAIRS[S.hair].name); break;
+  }
+  refresh();
+});
+
+renderName();
+</script>
+</body>
+</html>
