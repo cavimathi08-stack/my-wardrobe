@@ -376,7 +376,7 @@ const HAIRS = [
 ];
 
 /* ================= state ================= */
-let S = { name:'', face:'', top:0, bottom:0, shoe:0, skin:0, hair:0 };
+let S = { name:'', face:'', top:0, bottom:0, shoe:0, skin:4, hair:2 };
 try { Object.assign(S, JSON.parse(localStorage.getItem('my-wardrobe') || '{}')); } catch(e) {}
 const save = () => { try { localStorage.setItem('my-wardrobe', JSON.stringify(S)); } catch(e) {} };
 
