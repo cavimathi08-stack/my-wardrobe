@@ -1,6 +1,5 @@
-# My Wardrobe 💛
-
-A retro outfit builder inspired by the computer closet in *Clueless*, with a blue zebra background.
+# My Wardrobe 
+A retro outfit builder inspired by the computer closet in *Clueless*
 
 - **Welcome screen:** enter your name, add your photo, then press START
 - **Browse:** flip through tops and bottoms with the arrows. BROWSE shuffles a random outfit
